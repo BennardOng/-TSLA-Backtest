@@ -1,0 +1,39 @@
+import yfinance as yf
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = yf.download('TSLA', start= '2010-11-01')
+
+df['MA20'] = df['Adj Close'].rolling(20).mean()
+df['MA100'] = df['Adj Close'].rolling(100).mean()
+
+df = df.dropna()
+
+plt.figure(figsize=(12,5))
+plt.plot(df['Adj Close'], label= 'Asset price', c='blue', alpha=0.5)
+plt.plot(df['MA20'], label='MA20', c='k', alpha = 0.9)
+plt.plot(df['MA100'], label='MA100', c='magenta', alpha = 0.9)
+plt.scatter(df.iloc[Buy].index, df.iloc[Buy]['Adj Close'], marker='^', color='g', s=100)
+plt.scatter(df.iloc[Sell].index, df.iloc[Sell]['Adj Close'], marker='v', color='r', s=100)
+plt.legend()
+plt.show()
+
+Realbuys = [i+1 for i in Buy]
+Realsells = [i+1 for i in Sell]
+
+Buyprices = df.Open.iloc[Realbuys]
+Sellprices = df.Open.iloc[Realsells]
+
+if Sellprices.index[0] < Buyprices.index[0]:
+    Sellprices = Sellprices.drop(Sellprices.index[0])
+elif Buyprices.index[-1] > Sellprices.index[-1]:
+    Buyprices = Buyprices.drop(Buyprices.index[-1])
+    
+profitsrel = []
+
+for i in range(len(Sellprices)):
+    profitsrel.append((Sellprices[i] - Buyprices[i])/Buyprices[i])
+    
+ sum(profitsrel)/len(profitsrel)
+ 
+ pd.DataFrame(profitsrel).mean()
